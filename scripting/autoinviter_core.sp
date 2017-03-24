@@ -53,8 +53,6 @@ public APLRes:AskPluginLoad2(Handle:plugin, bool:late, String:error[], err_max)
 	CreateNative("SteamGroupAnnouncement", nativeGroupAnnouncement);
 	CreateNative("SteamGroupInvite", nativeGroupInvite);
 	
-	RegPluginLibrary("steamcore");
-	
 	return APLRes_Success;
 }
 
