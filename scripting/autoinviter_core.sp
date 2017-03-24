@@ -103,7 +103,7 @@ public Action:timeIncreaser(Handle:timer)
 
 public OnConfigsExecuted()
 {
-	DEBUG = GetConVarBool(FindConVar("sc_debug"));
+	DEBUG = GetConVarBool(FindConVar("autoinviter_debug"));
 	if (timeSinceLastLogin > 10)
 	{
 		PrintDebug(0, "\n============================================================================\n");
