@@ -20,7 +20,9 @@
 #include <sourcemod>
 #include <autoinviter_core>
 
-#define PLUGIN_VERSION "1.0"
+new String:g_sCmdLogPath[256];
+
+#define PLUGIN_VERSION "1.1"
 
 public Plugin:myinfo = 
 {
@@ -33,10 +35,22 @@ public Plugin:myinfo =
 
 new Handle:cvarGroupID;
 
+new Handle:cvar_log;
+
 public OnPluginStart()
 {
+	for(new i=0;;i++)
+	{
+		BuildPath(Path_SM, g_sCmdLogPath, sizeof(g_sCmdLogPath), "logs/autoinviter_%d.log", i);
+		if ( !FileExists(g_sCmdLogPath) )
+			break;
+	}
+	
+	
 	CreateConVar("sm_franugautoinviter_version", PLUGIN_VERSION, "", FCVAR_SPONLY | FCVAR_DONTRECORD | FCVAR_NOTIFY);
 	cvarGroupID = CreateConVar("sm_autoinviter_steamgroupid", "", "Group id where people is going to be invited.");
+	
+	cvar_log = CreateConVar("sm_autoinviter_logging", "1", "1 = enabled. 0 = disabled.");
 }
 
 public OnClientPostAdminCheck(client)
@@ -53,10 +67,12 @@ public OnClientPostAdminCheck(client)
 
 public callback(client, bool:success, errorCode, any:data)
 {
-	/*
+	if (!GetConVarBool(cvar_log))return;
+	
+	
 	if (client != 0 && !IsClientInGame(client)) return;
 	
-	if (success) PrintToChat(client, "The group invite has been sent.");
+	if (success) LogToFileEx(g_sCmdLogPath, "The group invite has been sent. Client %L", client);
 	else
 	{
 		if (errorCode < 0x10 || errorCode == 0x23)
@@ -65,11 +81,11 @@ public callback(client, bool:success, errorCode, any:data)
 		}
 		switch(errorCode)
 		{
-			case 0x01:	PrintToChat(client, "Server is busy with another task at this time, try again in a few seconds.");
-			case 0x02:	PrintToChat(client, "There was a timeout in your request, try again.");
-			case 0x23:	PrintToChat(client, "Session expired, retry to reconnect.");
-			case 0x27:	PrintToChat(client, "Target has already received an invite or is already on the group.");
-			default:	PrintToChat(client, "There was an error \x010x%02x \x07FFF047while sending your invite :(", errorCode);
+			case 0x01:LogToFileEx(g_sCmdLogPath, "Server is busy with another task at this time, try again in a few seconds. Client %L", client);
+			case 0x02:	LogToFileEx(g_sCmdLogPath, "There was a timeout in your request, try again. Client %L", client);
+			case 0x23:	LogToFileEx(g_sCmdLogPath, "Session expired, retry to reconnect. Client %L", client);
+			case 0x27:	LogToFileEx(g_sCmdLogPath, "Target has already received an invite or is already on the group. Client %L", client);
+			default:	LogToFileEx(g_sCmdLogPath, "There was an error \x010x%02x while sending your invite. Client %L", errorCode, client);
 		}
-	}*/
+	}
 }
