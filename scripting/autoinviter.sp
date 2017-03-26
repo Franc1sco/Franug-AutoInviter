@@ -132,10 +132,14 @@ public callback(client, bool:success, errorCode, any:data)
 {
 	if (!GetConVarBool(cvar_log))return;
 	
-	if (success) LogToFileEx(g_sCmdLogPath, "The group invite has been sent.");
+	if (success)
+	{
+		LogToFileEx(g_sCmdLogPath, "The group invite has been sent.");
+		//PrintToConsoleAll( "The group invite has been sent.");
+	}
 	else
 	{
-		//PrintToChat(client, "There was an error \x010x%02x while sending your invite.", errorCode);
+		//PrintToConsoleAll( "There was an error 0x%02x while sending your invite.", errorCode);
 		if (errorCode < 0x10 || errorCode == 0x23)
 		{
 
@@ -146,7 +150,21 @@ public callback(client, bool:success, errorCode, any:data)
 			case 0x02:	LogToFileEx(g_sCmdLogPath, "There was a timeout in your request, try again.");
 			case 0x23:	LogToFileEx(g_sCmdLogPath, "Session expired, retry to reconnect.");
 			case 0x27:	LogToFileEx(g_sCmdLogPath, "Target has already received an invite or is already on the group.");
-			default:	LogToFileEx(g_sCmdLogPath, "There was an error \x010x%02x while sending your invite.", errorCode);
+			default:	LogToFileEx(g_sCmdLogPath, "There was an error 0x%02x while sending your invite.", errorCode);
 		}
 	}
 }
+
+stock PrintToConsoleAll(const String:format[], any:...) 
+{ 
+    decl String:text[192]; 
+    for (new x = 1; x <= MaxClients; x++) 
+    { 
+        if (IsClientInGame(x)) 
+        { 
+            SetGlobalTransTarget(x); 
+            VFormat(text, sizeof(text), format, 2); 
+            PrintToConsole(x, text); 
+        } 
+    } 
+}  
