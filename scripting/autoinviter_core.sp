@@ -43,7 +43,7 @@ new Function:callbackFunction;
 new Handle:finalRequest;
 new SteamWorksHTTPRequestCompleted:finalFunction;
 
-#define PLUGIN_VERSION "1.1"
+#define PLUGIN_VERSION "1.1.1"
 
 public Plugin:myinfo = 
 {
@@ -117,7 +117,7 @@ public OnConfigsExecuted()
 	{
 		PrintDebug(0, "\n============================================================================\n");
 		PrintDebug(0, "Logging in to keep login alive...");
-		startRequest(0, INVALID_HANDLE, INVALID_FUNCTION, INVALID_HANDLE, INVALID_FUNCTION); // Starts an empty login request
+		if(FindConVar("sm_morercon_host") == null) startRequest(0, INVALID_HANDLE, INVALID_FUNCTION, INVALID_HANDLE, INVALID_FUNCTION); // Starts an empty login request
 	}
 }
 
