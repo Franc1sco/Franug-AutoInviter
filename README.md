@@ -9,8 +9,8 @@
 ## Cvars:
 ```
 sm_autoinviter_steamgroupid "" // Group id where people is going to be invited.
-autoinviter_username "" // Steam login username.
-autoinviter_password "" // Steam login password.
+sm_autoinviter_username "" // Steam login username.
+sm_autoinviter_password "" // Steam login password.
 sm_autoinviter_logging 1" // 1 = enabled. 0 = disabled.
 ```
 
