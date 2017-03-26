@@ -43,6 +43,17 @@ new Function:callbackFunction;
 new Handle:finalRequest;
 new SteamWorksHTTPRequestCompleted:finalFunction;
 
+#define PLUGIN_VERSION "1.1"
+
+public Plugin:myinfo = 
+{
+	name = "SM Franug Auto Inviter - Core",
+	author = "Franc1sco franug",
+	description = "",
+	version = PLUGIN_VERSION,
+	url = "http://steamcommunity.com/id/franug"
+}
+
 // ===================================================================================
 // ===================================================================================
 
@@ -65,9 +76,9 @@ public OnPluginStart()
 	hTimeIncreaser = CreateTimer(TIMER_UPDATE_TIME*60.0, timeIncreaser, INVALID_HANDLE, TIMER_REPEAT);
 	
 	// Convars
-	cvarUsername = CreateConVar("autoinviter_username", "", "Steam login username.", FCVAR_PROTECTED);
-	cvarPassword = CreateConVar("autoinviter_password", "", "Steam login password.", FCVAR_PROTECTED);
-	cvarDebug = CreateConVar("autoinviter_debug", "0", "Toggles debugging.", 0, true, 0.0, true, 1.0);
+	cvarUsername = CreateConVar("sm_autoinviter_username", "", "Steam login username.", FCVAR_PROTECTED);
+	cvarPassword = CreateConVar("sm_autoinviter_password", "", "Steam login password.", FCVAR_PROTECTED);
+	cvarDebug = CreateConVar("sm_autoinviter_debug", "0", "Toggles debugging.", 0, true, 0.0, true, 1.0);
 	
 	HookConVarChange(cvarUsername, OnLoginInfoChange);
 	HookConVarChange(cvarPassword, OnLoginInfoChange);
@@ -101,7 +112,7 @@ public Action:timeIncreaser(Handle:timer)
 
 public OnConfigsExecuted()
 {
-	DEBUG = GetConVarBool(FindConVar("autoinviter_debug"));
+	DEBUG = GetConVarBool(FindConVar("sm_autoinviter_debug"));
 	if (timeSinceLastLogin > 10)
 	{
 		PrintDebug(0, "\n============================================================================\n");
@@ -146,7 +157,7 @@ public nativeGroupAnnouncement(Handle:plugin, numParams)
 	SteamWorks_SetHTTPRequestGetOrPostParameter(_finalRequest, "languages[0][headline]", title);
 	SteamWorks_SetHTTPRequestGetOrPostParameter(_finalRequest, "languages[0][body]", body);
 	
-	startRequest(client, _finalRequest, cbkGroupAnnouncement, plugin, Function:GetNativeCell(5));
+	startRequest(client, _finalRequest, cbkGroupAnnouncement, plugin, GetNativeCell(5));
 }
 
 public nativeGroupInvite(Handle:plugin, numParams)
@@ -178,7 +189,7 @@ public nativeGroupInvite(Handle:plugin, numParams)
 	SteamWorks_SetHTTPRequestGetOrPostParameter(_finalRequest, "group", groupID);
 	SteamWorks_SetHTTPRequestGetOrPostParameter(_finalRequest, "invitee", invitee);
 	
-	startRequest(client, _finalRequest, cbkGroupInvite, plugin, Function:GetNativeCell(4));
+	startRequest(client, _finalRequest, cbkGroupInvite, plugin, GetNativeCell(4));
 }
 
 // ===================================================================================
