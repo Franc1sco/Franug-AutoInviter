@@ -6,6 +6,26 @@
 * Steam account with steam guard disabled. **You should not use your personal account for this, it could be flagged as a spam bot.**
 
 
+## Installation:
+
+
+If you use this in **only 1 server** then drag and drop, configure the cvars and you are done.
+
+
+If you use this in **multiple servers** then you need select 1 server as receptor of all the request.
+
+In the receptor server, drag and drop, configure the cvars and you are done with that server.
+
+In the rest of servers, drag and drop, move morercon.smx from plugins/disabled directory to plugins/ for enable the plugin. Then configure his cvars:
+```
+sm_morercon_host "151.80.47.226" // Receptor server IP
+sm_morercon_port "27016" // Receptor server PORT
+sm_morercon_password "password" // Receptor server RCON password
+```
+
+The receptor server need to allow rcon connections requests from the others servers.
+
+
 ## Cvars:
 ```
 sm_autoinviter_steamgroupid "" // Group id where people is going to be invited.
