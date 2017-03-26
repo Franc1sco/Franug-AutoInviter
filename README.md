@@ -15,3 +15,12 @@ autoinviter_password "" // Steam login password.
 
 
 Note: Here how to get steamgroup id -> https://support.multiplay.co.uk/support/solutions/articles/1000202859-how-can-i-find-my-steam-group-64-id-
+
+
+## TODO list (soon)
+```
+-Support for add multiple steam accounts.
+-Support for add multiple steam groups.
+-Save invited players in a mysql for not invite again.
+-Control how much invites send in X time.
+```
