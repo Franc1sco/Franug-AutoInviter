@@ -24,7 +24,7 @@
 
 new String:g_sCmdLogPath[256];
 
-#define PLUGIN_VERSION "2.0"
+#define PLUGIN_VERSION "2.0.1"
 
 public Plugin:myinfo = 
 {
@@ -80,6 +80,8 @@ public OnPluginStart()
 public OnAllPluginsLoaded()
 {
 	redirect = false;
+	if(GetCommandFlags("sm_morercon") == INVALID_FCVAR_FLAGS)return;
+	
 	Handle host = FindConVar("sm_morercon_host");
 	if(host != null)
 	{
@@ -133,6 +135,7 @@ public callback(client, bool:success, errorCode, any:data)
 	if (success) LogToFileEx(g_sCmdLogPath, "The group invite has been sent.");
 	else
 	{
+		//PrintToChat(client, "There was an error \x010x%02x while sending your invite.", errorCode);
 		if (errorCode < 0x10 || errorCode == 0x23)
 		{
 
