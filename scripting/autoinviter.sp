@@ -24,7 +24,7 @@
 
 new String:g_sCmdLogPath[256];
 
-#define PLUGIN_VERSION "2.0.1"
+#define PLUGIN_VERSION "2.0.2"
 
 public Plugin:myinfo = 
 {
@@ -39,10 +39,6 @@ new Handle:cvarGroupID;
 
 new Handle:cvar_log;
 
-char sBuffer_IP[256];
-
-bool redirect;
-
 public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 {
 	MarkNativeAsOptional("SteamGroupInvite");
@@ -51,15 +47,6 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 
 public OnPluginStart()
 {
-	int ips[4];
-	int ip = GetConVarInt(FindConVar("hostip"));
-	int port = GetConVarInt(FindConVar("hostport"));
-	ips[0] = (ip >> 24) & 0x000000FF;
-	ips[1] = (ip >> 16) & 0x000000FF;
-	ips[2] = (ip >> 8) & 0x000000FF;
-	ips[3] = ip & 0x000000FF;
-	Format(sBuffer_IP, sizeof(sBuffer_IP), "%d.%d.%d.%d:%d", ips[0], ips[1], ips[2], ips[3],port);
-         
 	for(new i=0;;i++)
 	{
 		BuildPath(Path_SM, g_sCmdLogPath, sizeof(g_sCmdLogPath), "logs/autoinviter_%d.log", i);
@@ -75,33 +62,6 @@ public OnPluginStart()
 	
 	
 	RegAdminCmd("sm_invite", Invitation, ADMFLAG_ROOT);
-}
-
-public OnAllPluginsLoaded()
-{
-	redirect = false;
-	if(GetCommandFlags("sm_morercon") == INVALID_FCVAR_FLAGS)return;
-	
-	Handle host = FindConVar("sm_morercon_host");
-	if(host != null)
-	{
-		char sBuffer[256], sport[256], shost[256];
-		
-		GetConVarString(host, shost, 256);
-		CloseHandle(host);
-		if (StrEqual(shost, "0.0.0.0"))return;
-		
-		Handle port = FindConVar("sm_morercon_port");
-		GetConVarString(port, sport, 256);
-		CloseHandle(host);
-		
-		Format(sBuffer, 256, "%s:%s", shost, sport);
-		
-		if (StrEqual(sBuffer, sBuffer_IP))return;
-		
-		redirect = true;
-		
-	}
 }
 
 public Action:Invitation(client, args)
@@ -123,9 +83,13 @@ public OnClientPostAdminCheck(client)
 	new String:steamID64[32];
 	GetClientAuthId(client, AuthId_SteamID64, steamID64, sizeof steamID64);
 	
-	if (redirect)ServerCommand("sm_morercon %s", steamID64);
+	if (CommandExists("sm_morercon"))
+	{
+		//PrintToChat(client, "redirect %s", steamID64);
+		ServerCommand("sm_morercon sm_invite %s", steamID64);
+	}
 	else if(GetFeatureStatus(FeatureType_Native, "SteamGroupInvite") == FeatureStatus_Available) SteamGroupInvite(client, steamID64, steamGroup, callback);
-
+	//PrintToChat(client, "pasado");
 }
 
 public callback(client, bool:success, errorCode, any:data)

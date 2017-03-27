@@ -115,9 +115,11 @@ public OnConfigsExecuted()
 	DEBUG = GetConVarBool(FindConVar("sm_autoinviter_debug"));
 	if (timeSinceLastLogin > 10)
 	{
+		if (CommandExists("sm_morercon"))return;
+		
 		PrintDebug(0, "\n============================================================================\n");
 		PrintDebug(0, "Logging in to keep login alive...");
-		if(GetCommandFlags("sm_morercon") == INVALID_FCVAR_FLAGS) startRequest(0, INVALID_HANDLE, INVALID_FUNCTION, INVALID_HANDLE, INVALID_FUNCTION); // Starts an empty login request
+		startRequest(0, INVALID_HANDLE, INVALID_FUNCTION, INVALID_HANDLE, INVALID_FUNCTION); // Starts an empty login request
 	}
 }
 
