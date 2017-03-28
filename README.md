@@ -33,7 +33,7 @@ sm_autoinviter_password "" // Steam login password.
 sm_autoinviter_logging "1" // 1 = enabled. 0 = disabled.
 ```
 
-Configure the groups to invite here: configs/franug-autoinviter/franug_autoinviter.cfg (use steamgroup id per section)
+**Configure the groups to invite here: configs/franug-autoinviter/franug_autoinviter.cfg (use steamgroup id per section).**
 
 
 Note: Here how to get steamgroup id -> https://support.multiplay.co.uk/support/solutions/articles/1000202859-how-can-i-find-my-steam-group-64-id-
