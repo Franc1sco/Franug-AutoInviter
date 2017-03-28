@@ -3,6 +3,8 @@
 
 * SteamWorks -> https://forums.alliedmods.net/showthread.php?t=229556
 
+* Socket -> https://forums.alliedmods.net/showthread.php?t=67640
+
 * Steam account with steam guard disabled. **You should not use your personal account for this, it could be flagged as a spam bot.**
 
 
