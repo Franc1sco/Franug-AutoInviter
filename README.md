@@ -45,3 +45,7 @@ Note: Here how to get steamgroup id -> https://support.multiplay.co.uk/support/s
 -Save invited players in a mysql for not invite again.
 -Control how much invites send in X time.
 ```
+
+
+## Read rules here: https://github.com/Franc1sco/Franug-PRIVATE-PLUGINS
+## Dont forget to give me +rep in my steam profile ( http://steamcommunity.com/id/franug ) if you like my plugins :)
