@@ -22,9 +22,22 @@
 #undef REQUIRE_PLUGIN
 #include <autoinviter_core>
 
-new String:g_sCmdLogPath[256];
+#define MAX_SPRAYS 128
 
-#define PLUGIN_VERSION "2.0.2"
+new String:g_sCmdLogPath[256];
+new String:path_decals[PLATFORM_MAX_PATH];
+
+enum Listado
+{
+	String:Nombre[64]
+}
+
+new g_sprays[MAX_SPRAYS][Listado];
+new g_sprayCount = 0;
+
+new order = 0;
+
+#define PLUGIN_VERSION "2.1"
 
 public Plugin:myinfo = 
 {
@@ -34,8 +47,6 @@ public Plugin:myinfo =
 	version = PLUGIN_VERSION,
 	url = "http://steamcommunity.com/id/franug"
 }
-
-new Handle:cvarGroupID;
 
 new Handle:cvar_log;
 
@@ -56,7 +67,6 @@ public OnPluginStart()
 	
 	
 	CreateConVar("sm_franugautoinviter_version", PLUGIN_VERSION, "", FCVAR_SPONLY | FCVAR_DONTRECORD | FCVAR_NOTIFY);
-	cvarGroupID = CreateConVar("sm_autoinviter_steamgroupid", "", "Group id where people is going to be invited.");
 	
 	cvar_log = CreateConVar("sm_autoinviter_logging", "1", "1 = enabled. 0 = disabled.");
 	
@@ -64,22 +74,56 @@ public OnPluginStart()
 	RegAdminCmd("sm_invite", Invitation, ADMFLAG_ROOT);
 }
 
+public OnMapStart()
+{
+	BuildPath(Path_SM, path_decals, sizeof(path_decals), "configs/franug-autoinviter/franug_autoinviter.cfg");
+	ReadDecals();
+}
+
+ReadDecals() {
+	
+	decl String:buffer[PLATFORM_MAX_PATH];
+	g_sprayCount = 0;
+	
+
+	Handle kv = CreateKeyValues("Autoinviter");
+	FileToKeyValues(kv, path_decals);
+
+	if (!KvGotoFirstSubKey(kv)) {
+
+		SetFailState("CFG File not found: %s", path_decals);
+		CloseHandle(kv);
+	}
+	do {
+
+		KvGetSectionName(kv, buffer, sizeof(buffer));
+		Format(g_sprays[g_sprayCount][Nombre], 64, "%s", buffer);
+		
+		g_sprayCount++;
+	} while (KvGotoNextKey(kv));
+	CloseHandle(kv);
+}
+
 public Action:Invitation(client, args)
 {
 	decl String:arg[32];
 	GetCmdArg(1, arg, sizeof arg);
+
 	
-	decl String:steamGroup[65];
-	GetConVarString(cvarGroupID, steamGroup, sizeof(steamGroup));
+	if(GetFeatureStatus(FeatureType_Native, "SteamGroupInvite") == FeatureStatus_Available) 
+	{
+		char steamGroup[64];
+		strcopy(steamGroup, 64, g_sprays[order][Nombre]);
+		order++;
 	
-	if(GetFeatureStatus(FeatureType_Native, "SteamGroupInvite") == FeatureStatus_Available) SteamGroupInvite(0, arg, steamGroup, callback);
+		if (order >= g_sprayCount) order = 0;
+		
+		SteamGroupInvite(0, arg, steamGroup, callback);
+	}
 }
 
 public OnClientPostAdminCheck(client)
 {
-	decl String:steamGroup[65];
-	GetConVarString(cvarGroupID, steamGroup, sizeof(steamGroup));
-
 	new String:steamID64[32];
 	GetClientAuthId(client, AuthId_SteamID64, steamID64, sizeof steamID64);
 	
@@ -88,7 +132,15 @@ public OnClientPostAdminCheck(client)
 		//PrintToChat(client, "redirect %s", steamID64);
 		ServerCommand("sm_morercon sm_invite %s", steamID64);
 	}
-	else if(GetFeatureStatus(FeatureType_Native, "SteamGroupInvite") == FeatureStatus_Available) SteamGroupInvite(client, steamID64, steamGroup, callback);
+	else if(GetFeatureStatus(FeatureType_Native, "SteamGroupInvite") == FeatureStatus_Available)
+	{
+		char steamGroup[64];
+		strcopy(steamGroup, 64, g_sprays[order][Nombre]);
+		order++;
+	
+		if (order >= g_sprayCount) order = 0;
+		SteamGroupInvite(client, steamID64, steamGroup, callback);
+	}
 	//PrintToChat(client, "pasado");
 }
 
