@@ -37,7 +37,7 @@ new g_sprayCount = 0;
 
 new order = 0;
 
-#define PLUGIN_VERSION "2.1"
+#define PLUGIN_VERSION "2.2"
 
 public Plugin:myinfo = 
 {
@@ -124,6 +124,9 @@ public Action:Invitation(client, args)
 
 public OnClientPostAdminCheck(client)
 {
+	if (IsFakeClient(client))return;
+	
+	
 	new String:steamID64[32];
 	GetClientAuthId(client, AuthId_SteamID64, steamID64, sizeof steamID64);
 	
