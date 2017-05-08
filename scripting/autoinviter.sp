@@ -37,7 +37,7 @@ new g_sprayCount = 0;
 
 new order = 0;
 
-#define PLUGIN_VERSION "2.2.2"
+#define PLUGIN_VERSION "2.2.3"
 
 public Plugin:myinfo = 
 {
@@ -158,11 +158,6 @@ public callback(client, bool:success, errorCode, any:data)
 	}
 	else
 	{
-		//PrintToConsoleAll( "There was an error 0x%02x while sending your invite.", errorCode);
-		if (errorCode < 0x10 || errorCode == 0x23)
-		{
-
-		}
 		switch(errorCode)
 		{
 			case 0x01:	LogToFileEx(g_sCmdLogPath, "Server is busy with another task at this time, try again in a few seconds.");
