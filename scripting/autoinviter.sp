@@ -37,7 +37,7 @@ new g_sprayCount = 0;
 
 new order = 0;
 
-#define PLUGIN_VERSION "2.2.1"
+#define PLUGIN_VERSION "2.2.2"
 
 public Plugin:myinfo = 
 {
@@ -187,7 +187,7 @@ public callback(client, bool:success, errorCode, any:data)
 			case 0x24:	LogToFileEx(g_sCmdLogPath, "Invite Error: Inviter account is not a member of the group or does not have permissions to invite.");
 			case 0x25:	LogToFileEx(g_sCmdLogPath, "Invite Error: Limited account. Only full Steam accounts can send Steam group invites");
 			case 0x26:	LogToFileEx(g_sCmdLogPath, "Invite Error: Unknown error.");
-			case 0x27:	LogToFileEx(g_sCmdLogPath, "Invite Error: Invitee has already received an invite or is already on the group.");
+			case 0x27:	LogToFileEx(g_sCmdLogPath, "Target has already received an invite or is already on the group.");
 
 			default:	LogToFileEx(g_sCmdLogPath, "There was an error 0x%02x while sending your invite.", errorCode);
 		}
