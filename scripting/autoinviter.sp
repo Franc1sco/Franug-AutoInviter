@@ -37,7 +37,7 @@ new g_sprayCount = 0;
 
 new order = 0;
 
-#define PLUGIN_VERSION "2.2"
+#define PLUGIN_VERSION "2.2.1"
 
 public Plugin:myinfo = 
 {
@@ -165,10 +165,30 @@ public callback(client, bool:success, errorCode, any:data)
 		}
 		switch(errorCode)
 		{
-			case 0x01:LogToFileEx(g_sCmdLogPath, "Server is busy with another task at this time, try again in a few seconds.");
+			case 0x01:	LogToFileEx(g_sCmdLogPath, "Server is busy with another task at this time, try again in a few seconds.");
 			case 0x02:	LogToFileEx(g_sCmdLogPath, "There was a timeout in your request, try again.");
-			case 0x23:	LogToFileEx(g_sCmdLogPath, "Session expired, retry to reconnect.");
-			case 0x27:	LogToFileEx(g_sCmdLogPath, "Target has already received an invite or is already on the group.");
+			case 0x03:	LogToFileEx(g_sCmdLogPath, "Login Error: Invalid login information, it means there are errors in the Cvar Strings.");
+			case 0x04:	LogToFileEx(g_sCmdLogPath, "Login Error: Failed http RSA Key request.");
+			case 0x05:	LogToFileEx(g_sCmdLogPath, "Login Error: RSA Key response failed, unknown reason, probably server side.");
+			case 0x06:	LogToFileEx(g_sCmdLogPath, "Login Error: Failed htpps login request.");
+			case 0x07:	LogToFileEx(g_sCmdLogPath, "Login Error: Incorrect login data, required captcha or e-mail confirmation (Steam Guard).");
+			case 0x08:	LogToFileEx(g_sCmdLogPath, "Login Error: Failed http token request.");
+			case 0x09:	LogToFileEx(g_sCmdLogPath, "Login Error: Invalid session token. Incorrect cookie?.");
+	
+			case 0x10:	LogToFileEx(g_sCmdLogPath, "Announcement Error: Failed http group announcement request.");
+			case 0x11:	LogToFileEx(g_sCmdLogPath, "Announcement Error: Invalid steam login token.");
+			case 0x12:	LogToFileEx(g_sCmdLogPath, "Announcement Error: Form error on request.");
+	
+			// Invitee: Who receives the invite.
+			case 0x20:	LogToFileEx(g_sCmdLogPath, "Invite Error: Failed http group invite request.");
+			case 0x21:	LogToFileEx(g_sCmdLogPath, "Invite Error: Incorrect invitee or another error.");
+			case 0x22:	LogToFileEx(g_sCmdLogPath, "Invite Error: Incorrect Group ID or missing data.");
+			case 0x23:	LogToFileEx(g_sCmdLogPath, "Invite Error: Logged out. Retry to login.");
+			case 0x24:	LogToFileEx(g_sCmdLogPath, "Invite Error: Inviter account is not a member of the group or does not have permissions to invite.");
+			case 0x25:	LogToFileEx(g_sCmdLogPath, "Invite Error: Limited account. Only full Steam accounts can send Steam group invites");
+			case 0x26:	LogToFileEx(g_sCmdLogPath, "Invite Error: Unknown error.");
+			case 0x27:	LogToFileEx(g_sCmdLogPath, "Invite Error: Invitee has already received an invite or is already on the group.");
+
 			default:	LogToFileEx(g_sCmdLogPath, "There was an error 0x%02x while sending your invite.", errorCode);
 		}
 	}
