@@ -37,7 +37,7 @@ enum Listado
 new g_sprays[MAX_SPRAYS][Listado];
 new g_sprayCount = 0;
 
-#define PLUGIN_VERSION "3.0.1-dev"
+#define PLUGIN_VERSION "3.0.2-dev"
 
 public Plugin:myinfo = 
 {
@@ -290,9 +290,8 @@ public Action CheckSteam(Handle timer, any datapack)
 
 	int steam32;
 	
-	GetSteam32FromSteam64(steamid, steam32);
-	
-	SteamWorks_GetUserGroupStatusAuthID(steam32, StringToInt(groupid));
+	if(GetSteam32FromSteam64(steamid, steam32))
+		SteamWorks_GetUserGroupStatusAuthID(steam32, StringToInt(groupid));
 	
 }
 
