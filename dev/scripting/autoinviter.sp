@@ -37,7 +37,7 @@ enum Listado
 new g_sprays[MAX_SPRAYS][Listado];
 new g_sprayCount = 0;
 
-#define PLUGIN_VERSION "3.0-dev"
+#define PLUGIN_VERSION "3.0.1-dev"
 
 public Plugin:myinfo = 
 {
@@ -141,7 +141,20 @@ Checkgroup(char [] steam, int groupid)
 	int steam32;
 	char steam2[20];
 	strcopy(steam2, 20, steam);
-	GetSteam32FromSteam64(steam2, steam32);
+	if(!GetSteam32FromSteam64(steam2, steam32))
+	{
+		char buffer[255];
+	
+		if (ismysql == 1)
+			Format(buffer, sizeof(buffer), "DELETE FROM `autoinviter` WHERE `steam`='%s';", steam);
+		else
+			Format(buffer, sizeof(buffer), "DELETE FROM autoinviter WHERE steam='%s';", steam);
+		
+		
+		SQL_TQuery(db, tbasico, buffer);	
+		
+		return;
+	}
 	
 	//LogToFileEx(g_sCmdLogPath, "va a invitar a steamid32 %d al grupo %d", steam32, groupid);
 	
@@ -239,9 +252,9 @@ public tbasicoNew(Handle:owner, Handle:hndl, const String:error[], any data)
 	char buffer[255];
 	
 	if (ismysql == 1)
-		Format(buffer, sizeof(buffer), "DELETE FROM `autoinviter` WHERE `steam`='%d' AND `groupid`='0';", steamid, groupid);
+		Format(buffer, sizeof(buffer), "DELETE FROM `autoinviter` WHERE `steam`='%s' AND `groupid`='%d';", steamid, groupid);
 	else
-		Format(buffer, sizeof(buffer), "DELETE FROM autoinviter WHERE steam='%d' AND groupid='0';", steamid, groupid);
+		Format(buffer, sizeof(buffer), "DELETE FROM autoinviter WHERE steam='%s' AND groupid='%d';", steamid, groupid);
 		
 		
 	SQL_TQuery(db, tbasico, buffer);
@@ -508,7 +521,9 @@ stock bool GetSteam32FromSteam64(const char szSteam64Original[MAX_STEAM64_LENGTH
     
     // We don't want to actually edit the original string.
     // We make a new string for the editing.
-    strcopy(szSteam64, sizeof szSteam64, szSteam64Original);
+    int done = strcopy(szSteam64, sizeof szSteam64, szSteam64Original);
+    
+    if (done == -1)return false;
     
     // Remove the first three numbers
     ReplaceStringEx(szSteam64, sizeof(szSteam64), "765", "");
