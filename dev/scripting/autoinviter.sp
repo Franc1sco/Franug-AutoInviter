@@ -37,7 +37,7 @@ enum Listado
 new g_sprays[MAX_SPRAYS][Listado];
 new g_sprayCount = 0;
 
-#define PLUGIN_VERSION "3.0.3-dev"
+#define PLUGIN_VERSION "3.0.4-dev"
 
 public Plugin:myinfo = 
 {
@@ -87,6 +87,9 @@ public OnPluginStart()
 
 AddDB(char [] steam)
 {
+	if (StrContains(steam, "765", false) == -1)return;
+	
+	
 	//LogToFileEx(g_sCmdLogPath, "invitado a communityid %s", steam);
 	CheckSteamID(steam);
 }
