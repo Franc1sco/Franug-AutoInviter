@@ -28,6 +28,10 @@ sm_morercon_password "password" // Receptor server RCON password
 The receptor server need to allow rcon connections requests from the others servers.
 
 
+## If you want to use the "Dev" version, you need to add a database entry to databases.cfg called "autoinviter".
+
+
+
 ## Cvars:
 ```
 sm_autoinviter_username "" // Steam login username.
@@ -38,16 +42,12 @@ sm_autoinviter_logging "1" // 1 = enabled. 0 = disabled.
 **Configure the groups to invite here: configs/franug-autoinviter/franug_autoinviter.cfg (use steamgroup id per section).**
 
 
-Note: Here how to get steamgroup id -> https://support.multiplay.co.uk/support/solutions/articles/1000202859-how-can-i-find-my-steam-group-64-id-
+Note: 
 
+Get groupid64 -> https://support.multiplay.co.uk/support/solutions/articles/1000202859-how-can-i-find-my-steam-group-64-id-
 
-## TODO list (soon)
-```
--Support for add multiple steam accounts.
-[DONE] -Support for add multiple steam groups.
--Save invited players in a mysql for not invite again.
--Control how much invites send in X time.
-```
+Get groupid32 -> https://forums.alliedmods.net/attachment.php?attachmentid=154036&d=1461379861
+
 
 
 ## Read rules here: https://github.com/Franc1sco/Franug-PRIVATE-PLUGINS
