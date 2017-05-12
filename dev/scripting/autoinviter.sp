@@ -37,7 +37,7 @@ enum Listado
 new g_sprays[MAX_SPRAYS][Listado];
 new g_sprayCount = 0;
 
-#define PLUGIN_VERSION "3.0.2-dev"
+#define PLUGIN_VERSION "3.0.3-dev"
 
 public Plugin:myinfo = 
 {
@@ -97,7 +97,7 @@ CheckSteamID(char [] steam)
 	decl String:query[255];
 
 	Format(query, sizeof(query), "SELECT * FROM autoinviter WHERE steam = '%s'", steam);
-	//LogToFileEx(g_sCmdLogPath, "Query %s", query);
+	LogToFileEx(g_sCmdLogPath, "Query %s", query);
 	Handle datapack = CreateDataPack();
 	WritePackString(datapack, steam);
 	
@@ -150,7 +150,7 @@ Checkgroup(char [] steam, int groupid)
 		else
 			Format(buffer, sizeof(buffer), "DELETE FROM autoinviter WHERE steam='%s';", steam);
 		
-		
+		LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
 		SQL_TQuery(db, tbasico, buffer);	
 		
 		return;
@@ -194,7 +194,11 @@ public int SteamWorks_OnClientGroupStatus(int steamid32, int groupAccountID, boo
 	GetCommunityID(steam2, cid, 64);
 	//LogToFileEx(g_sCmdLogPath, "recibido de communityid %s con grupo %d - INVITADO", cid, groupAccountID);
 	
+	LogToFileEx(g_sCmdLogPath, "Added %s for groupid %i to the DATABASE", cid, groupAccountID);
+	
 	Format(query, sizeof(query), "INSERT INTO autoinviter(steam, last_accountuse, groupid) VALUES('%s', '%i', '%i');", cid, GetTime(), groupAccountID);
+	
+	LogToFileEx(g_sCmdLogPath, "Query %s", query);
 	SQL_TQuery(db, tbasico, query);
 	
 }
@@ -222,6 +226,7 @@ public Action MakeInvite(Handle timer, int groupid)
 {
 	char query[255];
 	Format(query, sizeof(query), "SELECT steam FROM autoinviter WHERE groupid = %d ORDER BY last_accountuse LIMIT 1;", groupid);
+	LogToFileEx(g_sCmdLogPath, "Query %s", query);
 	SQL_TQuery(db, tbasicoNew, query, groupid);
 }
 
@@ -252,12 +257,15 @@ public tbasicoNew(Handle:owner, Handle:hndl, const String:error[], any data)
 	char buffer[255];
 	
 	if (ismysql == 1)
-		Format(buffer, sizeof(buffer), "DELETE FROM `autoinviter` WHERE `steam`='%s' AND `groupid`='%d';", steamid, groupid);
+		Format(buffer, sizeof(buffer), "DELETE FROM `autoinviter` WHERE `steam`='%s' AND `groupid`='%d';", steamid, StringToInt(groupid));
 	else
-		Format(buffer, sizeof(buffer), "DELETE FROM autoinviter WHERE steam='%s' AND groupid='%d';", steamid, groupid);
+		Format(buffer, sizeof(buffer), "DELETE FROM autoinviter WHERE steam='%s' AND groupid='%d';", steamid, StringToInt(groupid));
 		
 		
+	LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
 	SQL_TQuery(db, tbasico, buffer);
+	
+	LogToFileEx(g_sCmdLogPath, "Sending invitation to %s for groupid %s", steamid, groupid);
 	
 	for (new i=0; i<g_sprayCount; ++i)
 		if(StrEqual(g_sprays[i][Nombre], groupid))
@@ -520,12 +528,12 @@ stock bool GetSteam32FromSteam64(const char szSteam64Original[MAX_STEAM64_LENGTH
     
     // We don't want to actually edit the original string.
     // We make a new string for the editing.
-    int done = strcopy(szSteam64, sizeof szSteam64, szSteam64Original);
+    strcopy(szSteam64, sizeof szSteam64, szSteam64Original);
     
-    if (done == -1)return false;
     
     // Remove the first three numbers
-    ReplaceStringEx(szSteam64, sizeof(szSteam64), "765", "");
+    int done = ReplaceStringEx(szSteam64, sizeof(szSteam64), "765", "");
+    if (done == -1)return false;
     
     // Because pawn does not support numbers bigger than 2147483647, we will need to subtract using a combination of numbers.
     // The combination can be
@@ -574,11 +582,11 @@ stock bool GetSteam32FromSteam64(const char szSteam64Original[MAX_STEAM64_LENGTH
             PrintToServer("Subtract %s from %s = %d", szFirstInteger, szSecondInteger, iResultInt);
             if(iResultInt)
             {
-                IntToString(iResultInt, szResultInt, sizeof szResultInt);
+                IntToString(iResultInt, szResultInt, sizeof(szResultInt));
                 
                 if( iNumCount != (iResultLen  = strlen(szResultInt) ) )
                 {
-                    SetStringZeros(szStringZeroes, sizeof szStringZeroes, iNumCount - iResultLen);
+                    SetStringZeros(szStringZeroes, sizeof(szStringZeroes), iNumCount - iResultLen);
                 }
                 
                 else
@@ -591,11 +599,11 @@ stock bool GetSteam32FromSteam64(const char szSteam64Original[MAX_STEAM64_LENGTH
             {
                 szResultInt = "";
                 
-                SetStringZeros(szStringZeroes, sizeof szStringZeroes, iNumCount);
+                SetStringZeros(szStringZeroes, sizeof(szStringZeroes), iNumCount);
                 PrintToServer("String Zeroes: %s", szResultInt);
             }
             
-            Format(szSteam32, sizeof szSteam32, "%s%s%s", szStringZeroes, szResultInt, szSteam32);
+            Format(szSteam32, sizeof(szSteam32), "%s%s%s", szStringZeroes, szResultInt, szSteam32);
             PrintToServer("Current Progress: %s", szSteam32);
             
             // Reset our stuff.
