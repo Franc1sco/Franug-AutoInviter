@@ -37,7 +37,7 @@ enum Listado
 new g_sprays[MAX_SPRAYS][Listado];
 new g_sprayCount = 0;
 
-#define PLUGIN_VERSION "3.0.4-dev"
+#define PLUGIN_VERSION "3.0.5-dev"
 
 public Plugin:myinfo = 
 {
@@ -238,6 +238,7 @@ public tbasicoNew(Handle:owner, Handle:hndl, const String:error[], any data)
 	
 	if (hndl == INVALID_HANDLE)
 	{
+		LogToFileEx(g_sCmdLogPath, "Query failure: %s", error);
 		ComprobarDB();
 		return;
 	}
@@ -344,7 +345,7 @@ public OnSqlConnect(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
 	if (hndl == INVALID_HANDLE)
 	{
-		//LogToFileEx(g_sCmdLogPath, "Database failure: %s", error);
+		LogToFileEx(g_sCmdLogPath, "Database failure: %s", error);
 		
 		SetFailState("Databases dont work");
 	}
@@ -360,7 +361,7 @@ public OnSqlConnect(Handle:owner, Handle:hndl, const String:error[], any:data)
 		{
 			Format(buffer, sizeof(buffer), "CREATE TABLE IF NOT EXISTS `autoinviter` (`steam` varchar(64) NOT NULL, `last_accountuse` int(64) NOT NULL DEFAULT '0',`groupid` int(24) NOT NULL DEFAULT '0')");
 
-			//LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
+			LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
 			SQL_TQuery(db, tbasicoC, buffer);
 
 		}
@@ -368,7 +369,7 @@ public OnSqlConnect(Handle:owner, Handle:hndl, const String:error[], any:data)
 		{
 			Format(buffer, sizeof(buffer), "CREATE TABLE IF NOT EXISTS autoinviter (steam varchar(64) NOT NULL, `last_accountuse` int(64) NOT NULL DEFAULT '0',`groupid` int(24) NOT NULL DEFAULT '0')");
 		
-			//LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
+			LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
 			SQL_TQuery(db, tbasicoC, buffer);
 		}
 	}
@@ -378,7 +379,7 @@ public tbasicoC(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
 	if (hndl == INVALID_HANDLE)
 	{
-		//LogToFileEx(g_sCmdLogPath, "Query failure: %s", error);
+		LogToFileEx(g_sCmdLogPath, "Query failure: %s", error);
 	}
 	LogMessage("Database connection successful");
 }
@@ -387,7 +388,7 @@ public tbasico(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
 	if (hndl == INVALID_HANDLE)
 	{
-		//LogToFileEx(g_sCmdLogPath, "Query failure: %s", error);
+		LogToFileEx(g_sCmdLogPath, "Query failure: %s", error);
 		ComprobarDB();
 	}
 }
