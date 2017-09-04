@@ -1,11 +1,33 @@
 ## Requeriments:
 
 
-* SteamWorks -> https://forums.alliedmods.net/showthread.php?t=229556
+* SteamWorks -> http://users.alliedmods.net/~kyles/builds/SteamWorks/
 
 * Socket -> https://forums.alliedmods.net/showthread.php?t=67640
 
-* Steam account with steam guard disabled. **You should not use your personal account for this, it could be flagged as a spam bot.**
+* Steam account (not your main account).
+
+## Setting Account
+
+After you have installed the plugin you need to configure the Steam account's credentials, to do so open sourcemod/configs/franug-autoinviter/franug_login.cfg and input the accounts credentials in the file, an example would be this:
+```
+"franug_login"
+{
+	"username"	"testaccountname789"
+	"password"	"arandompassword123"
+}
+```
+Use alphanumeric user/pass, max length: 32 characters
+
+Now to login to Steam servers you need join the server as a player and from console or chat (i recommend console) input the next command:
+
+sm_autoinviter_send_code or from chat /autoinviter_send_code
+
+This will send a Steam Guard code to the configured e-mail of the account. Copy the code and input the next command with the code:
+
+sm_autoinviter_input_code YOURCODE
+
+If everything is right, you should have now completed the setup process, if not use the command sm_autoinviter_last_error to check the last error in the errors table.
 
 
 ## Installation:
@@ -28,16 +50,8 @@ sm_morercon_password "password" // Receptor server RCON password
 The receptor server need to allow rcon connections requests from the others servers.
 
 
-## If you want to use the "Dev" version, you need to add a database entry to databases.cfg called "autoinviter".
+## Also you need to add a database entry to databases.cfg called "autoinviter".
 
-
-
-## Cvars:
-```
-sm_autoinviter_username "" // Steam login username.
-sm_autoinviter_password "" // Steam login password.
-sm_autoinviter_logging "1" // 1 = enabled. 0 = disabled.
-```
 
 **Configure the groups to invite here: configs/franug-autoinviter/franug_autoinviter.cfg (use steamgroup id per section).**
 

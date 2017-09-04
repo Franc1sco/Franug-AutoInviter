@@ -1,3 +1,17 @@
+/***
+bigint.inc - Big Integers Operation Library Functions
+
+Version: 0.1
+Date: 28-12-2014
+Author: Statik
+
+Provides some arithmetic and logical math functions to operate 
+with big integers.
+
+**UNFINISHED**
+
+***/
+
 #if defined _BigInt_included
 	#endinput
 #endif
