@@ -5,6 +5,8 @@
 
 * Socket -> https://forums.alliedmods.net/showthread.php?t=67640
 
+* SMJansson extension (.dll for Windows and .so for Linux) -> https://github.com/thraaawn/SMJansson/tree/master/bin
+
 * Steam account (not your main account).
 
 ## Setting Account
