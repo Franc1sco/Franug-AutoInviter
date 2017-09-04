@@ -39,7 +39,7 @@ enum Listado
 new g_sprays[MAX_SPRAYS][Listado];
 new g_sprayCount = 0;
 
-#define PLUGIN_VERSION "4.0 beta"
+#define PLUGIN_VERSION "4.0.1 beta"
 
 public Plugin:myinfo = 
 {
@@ -87,6 +87,14 @@ public OnPluginStart()
 	
 	BuildPath(Path_SM, path_decals, sizeof(path_decals), "configs/franug-autoinviter/franug_autoinviter.cfg");
 	ReadDecals();
+	
+	
+	CreateTimer(60.0, DoInvite, _, TIMER_REPEAT);
+}
+
+public Action DoInvite(Handle timer)
+{
+	PruneDatabase();
 }
 
 public OnClientPostAdminCheck(client)
@@ -121,6 +129,11 @@ AddDB(char [] steam)
 
 CheckSteamID(char [] steam)
 {
+	if (db == INVALID_HANDLE)
+	{
+		return;
+	}
+	
 	decl String:query[255];
 
 	Format(query, sizeof(query), "SELECT * FROM autoinviterv4 WHERE steam = '%s'", steam);
@@ -149,44 +162,16 @@ public T_CheckSteamID(Handle:owner, Handle:hndl, const String:error[], any datap
 
 	if (!SQL_GetRowCount(hndl) || !SQL_FetchRow(hndl)) 
 	{
-		//decl String:query[255];
-		for (new i=0; i<g_sprayCount; ++i)
-		{
-			Checkgroup(steam, StringToInt(g_sprays[i][Nombre]));
-			
-			//Format(query, sizeof(query), "INSERT INTO autoinviter(steam, last_accountuse, groupid) VALUES('%i', '%i', '%i');", steam, GetTime(), g_sprays[i][Nombre]);
-			//SQL_TQuery(db, tbasico, query);
-		}
+		SteamCommunityAddFriend(steam, 0);
 	}
 }
 
-Checkgroup(char [] steam, int groupid)
-{
-	
-	if (strlen(steam) < 3)return;
-	
-	int steam32 = SteamID64to32(steam);
-	
-	SteamWorks_GetUserGroupStatusAuthID(steam32, groupid);
-	
-}
-
-public int SteamWorks_OnClientGroupStatus(int steamid32, int groupAccountID, bool isMember, bool isOfficer)
-{
-	if (isMember || isOfficer)return;
-	
-	char friend[64];
-	SteamID32to64(steamid32, friend, 64);
-	
-	SteamCommunityAddFriend(friend, 0);
-
-}
 
 public OnCommunityAddFriendResult(const String:friend[], errorCode, any:pid)
 {
 	if (errorCode != 0x00)return;
 	char query[3096];
-	
+
 	Format(query, sizeof(query), "INSERT INTO autoinviterv4(steam, last_accountuse) VALUES('%s', '%i');", friend, GetTime());
 	
 	LogToFileEx(g_sCmdLogPath, "Query %s", query);
@@ -253,7 +238,7 @@ public OnSqlConnect(Handle:owner, Handle:hndl, const String:error[], any:data)
 		}
 		else
 		{
-			Format(buffer, sizeof(buffer), "CREATE TABLE IF NOT EXISTS autoinviterv4 (steam varchar(64) NOT NULL, `last_accountuse` int(64) NOT NULL DEFAULT '0',)");
+			Format(buffer, sizeof(buffer), "CREATE TABLE IF NOT EXISTS autoinviterv4 (steam varchar(64) NOT NULL, `last_accountuse` int(64) NOT NULL DEFAULT '0')");
 		
 			LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
 			SQL_TQuery(db, tbasicoC, buffer);
@@ -336,6 +321,8 @@ public OnChatRelationshipChange(const String:account[], SteamChatRelationship:re
 
 public Action:removeTimer(Handle:timer, any:SteamID32)
 {
+	if (db == INVALID_HANDLE)return;
+	
 	new String:SteamID64[32];
 	SteamID32to64(SteamID32, SteamID64, sizeof SteamID64);
 	
