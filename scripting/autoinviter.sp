@@ -39,7 +39,7 @@ enum Listado
 new g_sprays[MAX_SPRAYS][Listado];
 new g_sprayCount = 0;
 
-#define PLUGIN_VERSION "4.0.1 beta"
+#define PLUGIN_VERSION "4.0.2 beta"
 
 public Plugin:myinfo = 
 {
@@ -176,6 +176,8 @@ public OnCommunityAddFriendResult(const String:friend[], errorCode, any:pid)
 	
 	LogToFileEx(g_sCmdLogPath, "Query %s", query);
 	SQL_TQuery(db, tbasico, query);
+	
+	if(!SteamChatIsConnected()) SteamChatConnect();
 }
 
 
@@ -380,6 +382,8 @@ public tbasicoP(Handle:owner, Handle:hndl, const String:error[], any data)
 	{
 		while (SQL_FetchRow(hndl))
 		{
+			SQL_FetchString(hndl, 0, steamid, sizeof(steamid));
+			
 			if (ismysql == 1)
 				Format(buffer, sizeof(buffer), "DELETE FROM `autoinviterv4` WHERE `steam`='%s';", steamid);
 			else
