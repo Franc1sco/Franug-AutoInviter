@@ -52,6 +52,13 @@ sm_morercon_password "password" // Receptor server RCON password
 The receptor server need to allow rcon connections requests from the others servers.
 
 
+## Cvars for the autoinviter:
+
+```
+sm_franugautoinviter_chatmsg "Thanks for play in the Cola-Team community servers. Please accept the group invite that I sent you for keep you updated about out servers :)" // msg when the bot invite to someone
+```
+
+
 ## Also you need to add a database entry to databases.cfg called "autoinviter".
 
 
