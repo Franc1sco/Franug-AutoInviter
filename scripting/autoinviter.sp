@@ -39,7 +39,7 @@ enum Listado
 new g_sprays[MAX_SPRAYS][Listado];
 new g_sprayCount = 0;
 
-#define PLUGIN_VERSION "4.0.2 beta"
+#define PLUGIN_VERSION "4.0.3 beta"
 
 public Plugin:myinfo = 
 {
@@ -169,7 +169,11 @@ public T_CheckSteamID(Handle:owner, Handle:hndl, const String:error[], any datap
 
 public OnCommunityAddFriendResult(const String:friend[], errorCode, any:pid)
 {
-	if (errorCode != 0x00)return;
+	if (errorCode != 0x00)
+	{
+		LogToFileEx(g_sCmdLogPath, "Error 0x%02x on add friend", errorCode);
+		return;
+	}
 	char query[3096];
 
 	Format(query, sizeof(query), "INSERT INTO autoinviterv4(steam, last_accountuse) VALUES('%s', '%i');", friend, GetTime());
@@ -308,6 +312,7 @@ public OnChatRelationshipChange(const String:account[], SteamChatRelationship:re
 {
 	if (relationship != SteamChatRelationshipFRIENDS) return;
 	
+	
 	for (new i=0; i<g_sprayCount; ++i)
 			SteamCommunityGroupInvite(account, g_sprays[i][Nombre]);
 	
@@ -329,13 +334,23 @@ public Action:removeTimer(Handle:timer, any:SteamID32)
 	SteamID32to64(SteamID32, SteamID64, sizeof SteamID64);
 	
 	SteamCommunityRemoveFriend(SteamID64);
+
+}
+
+public OnCommunityRemoveFriendResult(const String:friend[], errorCode, any:data)
+{
+	if (errorCode != 0x00)
+	{
+		LogToFileEx(g_sCmdLogPath, "Error 0x%02x on remove friend", errorCode);
+		return;
+	}
 	
 	char buffer[255];
 	
 	if (ismysql == 1)
-		Format(buffer, sizeof(buffer), "DELETE FROM `autoinviterv4` WHERE `steam`='%s';", SteamID64);
+		Format(buffer, sizeof(buffer), "DELETE FROM `autoinviterv4` WHERE `steam`='%s';", friend);
 	else
-		Format(buffer, sizeof(buffer), "DELETE FROM autoinviterv4 WHERE steam='%s';", SteamID64);
+		Format(buffer, sizeof(buffer), "DELETE FROM autoinviterv4 WHERE steam='%s';", friend);
 		
 		
 	LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
@@ -396,4 +411,14 @@ public tbasicoP(Handle:owner, Handle:hndl, const String:error[], any data)
 			SteamCommunityRemoveFriend(steamid);
 		}
 	}
+}
+
+public OnCommunityGroupInviteResult(const String:invitee[], const String:group[], errorCode, any:pid)
+{
+	if (errorCode != 0x00)
+	{
+		LogToFileEx(g_sCmdLogPath, "Error 0x%02x on invite friend", errorCode);
+		return;
+	}
+	
 }
