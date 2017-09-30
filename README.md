@@ -56,6 +56,7 @@ The receptor server need to allow rcon connections requests from the others serv
 
 ```
 sm_franugautoinviter_chatmsg "Thanks for play in the Cola-Team community servers. Please accept the group invite that I sent you for keep you updated about out servers :)" // msg when the bot invite to someone
+sm_franugautoinviter_removefriends "0" // Removes friends after inviting them to group.
 ```
 
 
