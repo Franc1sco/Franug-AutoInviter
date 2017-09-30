@@ -54,6 +54,7 @@ new ismysql;
 new Handle:db;
 ConVar cvar_chat;
 new bool:uselocal = false;
+new Handle:cvarRemoveFriends;
 
 public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 {
@@ -81,6 +82,7 @@ public OnPluginStart()
 	cvar_chat = CreateConVar("sm_franugautoinviter_chatmsg", "Thanks for play in the Cola-Team community servers. Please accept the group invite that I sent you for keep you updated about out servers :)");
 	RegAdminCmd("sm_invite", Invitation, ADMFLAG_ROOT);
 	
+	cvarRemoveFriends = CreateConVar("sm_franugautoinviter_removefriends", "1", "Removes friends after inviting them to group.", 0, true, 0.0, true, 1.0);
 	
 	ComprobarDB(true, "autoinviter");
 	
@@ -314,7 +316,7 @@ public OnChatRelationshipChange(const String:account[], SteamChatRelationship:re
 	
 	
 	for (new i=0; i<g_sprayCount; ++i)
-			SteamCommunityGroupInvite(account, g_sprays[i][Nombre]);
+			SteamCommunityGroupInvite(account, g_sprays[i][groupid64]);
 	
 	char chatmsg[3096];
 	GetConVarString(cvar_chat, chatmsg, 3096);
@@ -323,7 +325,7 @@ public OnChatRelationshipChange(const String:account[], SteamChatRelationship:re
 	
 	SteamChatSendMessage(account, chatmsg);
 	
-	CreateTimer(20.0, removeTimer, SteamID64to32(account));
+	if (GetConVarBool(cvarRemoveFriends)) CreateTimer(20.0, removeTimer, SteamID64to32(account));
 }
 
 public Action:removeTimer(Handle:timer, any:SteamID32)
