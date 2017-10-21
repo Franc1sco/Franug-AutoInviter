@@ -25,7 +25,7 @@
 
 #define MAX_SPRAYS 128
 
-#define IDAYS 1
+#define IDAYS 7
 
 new String:g_sCmdLogPath[256];
 new String:path_decals[PLATFORM_MAX_PATH];
@@ -39,7 +39,7 @@ enum Listado
 new g_sprays[MAX_SPRAYS][Listado];
 new g_sprayCount = 0;
 
-#define PLUGIN_VERSION "4.0.3 beta"
+#define PLUGIN_VERSION "4.0.4 beta"
 
 public Plugin:myinfo = 
 {
