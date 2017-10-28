@@ -39,7 +39,7 @@ enum Listado
 new g_sprays[MAX_SPRAYS][Listado];
 new g_sprayCount = 0;
 
-#define PLUGIN_VERSION "4.0.4 beta"
+#define PLUGIN_VERSION "4.0.5 beta"
 
 public Plugin:myinfo = 
 {
@@ -314,9 +314,16 @@ public OnChatRelationshipChange(const String:account[], SteamChatRelationship:re
 {
 	if (relationship != SteamChatRelationshipFRIENDS) return;
 	
-	
+	int count = 5;
 	for (new i=0; i<g_sprayCount; ++i)
-			SteamCommunityGroupInvite(account, g_sprays[i][groupid64]);
+	{
+		DataPack pack;
+		CreateDataTimer(count*1.0, InvitePlayer, pack);
+		pack.WriteString(account);
+		pack.WriteString(g_sprays[i][groupid64]);
+			
+		count += 5;
+	}
 	
 	char chatmsg[3096];
 	GetConVarString(cvar_chat, chatmsg, 3096);
@@ -325,7 +332,20 @@ public OnChatRelationshipChange(const String:account[], SteamChatRelationship:re
 	
 	SteamChatSendMessage(account, chatmsg);
 	
-	if (GetConVarBool(cvarRemoveFriends)) CreateTimer(20.0, removeTimer, SteamID64to32(account));
+	if (GetConVarBool(cvarRemoveFriends)) CreateTimer(60.0, removeTimer, SteamID64to32(account));
+}
+
+public Action InvitePlayer(Handle timer, Handle pack)
+{
+	char account[128], group[128];
+ 
+	ResetPack(pack);
+	ReadPackString(pack, account, sizeof(account));
+	ReadPackString(pack, group, sizeof(account));
+ 
+	LogToFileEx(g_sCmdLogPath, "Sending invite to %s for the group id %s", account, group);
+	
+	SteamCommunityGroupInvite(account, group);
 }
 
 public Action:removeTimer(Handle:timer, any:SteamID32)
@@ -422,5 +442,7 @@ public OnCommunityGroupInviteResult(const String:invitee[], const String:group[]
 		LogToFileEx(g_sCmdLogPath, "Error 0x%02x on invite friend", errorCode);
 		return;
 	}
+	else
+		LogToFileEx(g_sCmdLogPath, "Invite sent to %s for %s group", invitee, group);
 	
 }
