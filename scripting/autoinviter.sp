@@ -32,14 +32,14 @@ new String:path_decals[PLATFORM_MAX_PATH];
 
 enum Listado
 {
-	String:Nombre[64],
+	String:Nombre[256],
 	String:groupid64[64]
 }
 
 new g_sprays[MAX_SPRAYS][Listado];
 new g_sprayCount = 0;
 
-#define PLUGIN_VERSION "4.0.5 beta"
+#define PLUGIN_VERSION "4.0.6 beta"
 
 public Plugin:myinfo = 
 {
@@ -79,7 +79,7 @@ public OnPluginStart()
 	
 	CreateConVar("sm_franugautoinviter_version", PLUGIN_VERSION, "", FCVAR_SPONLY | FCVAR_DONTRECORD | FCVAR_NOTIFY);
 	
-	cvar_chat = CreateConVar("sm_franugautoinviter_chatmsg", "Thanks for play in the Cola-Team community servers. Please accept the group invite that I sent you for keep you updated about out servers :)");
+	cvar_chat = CreateConVar("sm_franugautoinviter_chatmsg", "Thanks for play in the Cola-Team.com community servers. Please join to our steam groups for keep you updated about our servers :)");
 	RegAdminCmd("sm_invite", Invitation, ADMFLAG_ROOT);
 	
 	cvarRemoveFriends = CreateConVar("sm_franugautoinviter_removefriends", "1", "Removes friends after inviting them to group.", 0, true, 0.0, true, 1.0);
@@ -290,7 +290,7 @@ ReadDecals() {
 
 		KvGetSectionName(kv, g_sprays[g_sprayCount][groupid64], 64);
 		
-		KvGetString(kv, "groupid", g_sprays[g_sprayCount][Nombre], 64);
+		KvGetString(kv, "groupurl", g_sprays[g_sprayCount][Nombre], 256);
 		
 		g_sprayCount++;
 	} while (KvGotoNextKey(kv));
@@ -319,8 +319,8 @@ public OnChatRelationshipChange(const String:account[], SteamChatRelationship:re
 	{
 		DataPack pack;
 		CreateDataTimer(count*1.0, InvitePlayer, pack);
+		pack.WriteCell(i);
 		pack.WriteString(account);
-		pack.WriteString(g_sprays[i][groupid64]);
 			
 		count += 5;
 	}
@@ -337,15 +337,19 @@ public OnChatRelationshipChange(const String:account[], SteamChatRelationship:re
 
 public Action InvitePlayer(Handle timer, Handle pack)
 {
-	char account[128], group[128];
+	char account[128];
  
 	ResetPack(pack);
+	int i = ReadPackCell(pack);
 	ReadPackString(pack, account, sizeof(account));
-	ReadPackString(pack, group, sizeof(account));
  
-	LogToFileEx(g_sCmdLogPath, "Sending invite to %s for the group id %s", account, group);
+	LogToFileEx(g_sCmdLogPath, "Sending invite to %s for the group id %s", account, g_sprays[i][groupid64]);
 	
-	SteamCommunityGroupInvite(account, group);
+	SteamCommunityGroupInvite(account, g_sprays[i][groupid64]);
+	
+	if(!SteamChatIsConnected()) SteamChatConnect();
+	
+	if(strlen(g_sprays[i][Nombre]) > 2) SteamChatSendMessage(account, g_sprays[i][Nombre]);
 }
 
 public Action:removeTimer(Handle:timer, any:SteamID32)
