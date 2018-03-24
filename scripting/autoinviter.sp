@@ -23,7 +23,7 @@
 #undef REQUIRE_PLUGIN
 #include <steamcore>
 
-#define MAX_SPRAYS 128
+#define MAX_GROUPS 128
 
 #define IDAYS 7
 
@@ -36,10 +36,12 @@ enum Listado
 	String:groupid64[64]
 }
 
-new g_sprays[MAX_SPRAYS][Listado];
-new g_sprayCount = 0;
+new g_groups[MAX_GROUPS][Listado];
+new g_groupCount = 0;
 
-#define PLUGIN_VERSION "4.0.6 beta"
+bool g_invited[MAXPLAYERS + 1];
+
+#define PLUGIN_VERSION "4.1"
 
 public Plugin:myinfo = 
 {
@@ -88,7 +90,7 @@ public OnPluginStart()
 	
 	
 	BuildPath(Path_SM, path_decals, sizeof(path_decals), "configs/franug-autoinviter/franug_autoinviter.cfg");
-	ReadDecals();
+	ReadGroups();
 	
 	
 	CreateTimer(60.0, DoInvite, _, TIMER_REPEAT);
@@ -103,20 +105,56 @@ public OnClientPostAdminCheck(client)
 {
 	if (IsFakeClient(client))return;
 	
+	g_invited[client] = false;
+	
+	
+	for (new i=0; i<g_groupCount; ++i)
+	{
+		SteamWorks_GetUserGroupStatus(client, GroupID64to32(g_groups[i][groupid64]));
+	}
+	
+}
+
+public int SteamWorks_OnClientGroupStatus(int authid, int groupAccountID, bool isMember, bool isOfficer)
+{
+	int client = UserAuthGrab(authid);
+	
+	if (client == -1)return;
+	
+	if (isMember || isOfficer)return;
+	
+	if (g_invited[client])return;
+	
+	g_invited[client] = true;
 	
 	new String:steamID64[64];
 	GetClientAuthId(client, AuthId_SteamID64, steamID64, sizeof steamID64);
 	
 	if (CommandExists("sm_morercon"))
 	{
-		//PrintToChat(client, "redirect %s", steamID64);
 		ServerCommand("sm_morercon sm_invite %s", steamID64);
 	}
 	else
 	{
 		AddDB(steamID64);
 	}
-	//PrintToChat(client, "pasado");
+}
+
+
+int UserAuthGrab(int authid)
+{
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if (IsClientInGame(i))
+		{
+			char charauth[64], authchar[64];
+			GetClientAuthId(i, AuthId_Steam3, charauth, sizeof(charauth));
+			IntToString(authid, authchar, sizeof(authchar));
+			if(StrContains(charauth, authchar) != -1) return i;
+		}
+	}
+	
+	return -1;
 }
 
 AddDB(char [] steam)
@@ -127,7 +165,6 @@ AddDB(char [] steam)
 	//LogToFileEx(g_sCmdLogPath, "invitado a communityid %s", steam);
 	CheckSteamID(steam);
 }
-
 
 CheckSteamID(char [] steam)
 {
@@ -145,7 +182,6 @@ CheckSteamID(char [] steam)
 	
 	SQL_TQuery(db, T_CheckSteamID, query, datapack);
 }
-
  
 public T_CheckSteamID(Handle:owner, Handle:hndl, const String:error[], any datapack)
 {
@@ -273,9 +309,9 @@ public tbasico(Handle:owner, Handle:hndl, const String:error[], any:data)
 }
 
 
-ReadDecals() {
+ReadGroups() {
 	
-	g_sprayCount = 0;
+	g_groupCount = 0;
 	
 
 	Handle kv = CreateKeyValues("Autoinviter");
@@ -288,11 +324,11 @@ ReadDecals() {
 	}
 	do {
 
-		KvGetSectionName(kv, g_sprays[g_sprayCount][groupid64], 64);
+		KvGetSectionName(kv, g_groups[g_groupCount][groupid64], 64);
 		
-		KvGetString(kv, "groupurl", g_sprays[g_sprayCount][Nombre], 256);
+		KvGetString(kv, "groupurl", g_groups[g_groupCount][Nombre], 256);
 		
-		g_sprayCount++;
+		g_groupCount++;
 	} while (KvGotoNextKey(kv));
 	CloseHandle(kv);
 }
@@ -315,7 +351,7 @@ public OnChatRelationshipChange(const String:account[], SteamChatRelationship:re
 	if (relationship != SteamChatRelationshipFRIENDS) return;
 	
 	int count = 5;
-	for (new i=0; i<g_sprayCount; ++i)
+	for (new i=0; i<g_groupCount; ++i)
 	{
 		DataPack pack;
 		CreateDataTimer(count*1.0, InvitePlayer, pack);
@@ -343,13 +379,13 @@ public Action InvitePlayer(Handle timer, Handle pack)
 	int i = ReadPackCell(pack);
 	ReadPackString(pack, account, sizeof(account));
  
-	LogToFileEx(g_sCmdLogPath, "Sending invite to %s for the group id %s", account, g_sprays[i][groupid64]);
+	LogToFileEx(g_sCmdLogPath, "Sending invite to %s for the group id %s", account, g_groups[i][groupid64]);
 	
-	SteamCommunityGroupInvite(account, g_sprays[i][groupid64]);
+	SteamCommunityGroupInvite(account, g_groups[i][groupid64]);
 	
 	if(!SteamChatIsConnected()) SteamChatConnect();
 	
-	if(strlen(g_sprays[i][Nombre]) > 2) SteamChatSendMessage(account, g_sprays[i][Nombre]);
+	if(strlen(g_groups[i][Nombre]) > 2) SteamChatSendMessage(account, g_groups[i][Nombre]);
 }
 
 public Action:removeTimer(Handle:timer, any:SteamID32)
