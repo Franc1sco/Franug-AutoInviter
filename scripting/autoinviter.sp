@@ -175,7 +175,7 @@ CheckSteamID(char [] steam)
 	
 	decl String:query[255];
 
-	Format(query, sizeof(query), "SELECT * FROM autoinviterv4 WHERE steam = '%s'", steam);
+	Format(query, sizeof(query), "SELECT * FROM autoinviterv41 WHERE steam = '%s'", steam);
 	LogToFileEx(g_sCmdLogPath, "Query %s", query);
 	Handle datapack = CreateDataPack();
 	WritePackString(datapack, steam);
@@ -214,7 +214,7 @@ public OnCommunityAddFriendResult(const String:friend[], errorCode, any:pid)
 	}
 	char query[3096];
 
-	Format(query, sizeof(query), "INSERT INTO autoinviterv4(steam, last_accountuse) VALUES('%s', '%i');", friend, GetTime());
+	Format(query, sizeof(query), "INSERT INTO autoinviterv41(steam, last_accountuse) VALUES('%s', '%i');", friend, GetTime());
 	
 	LogToFileEx(g_sCmdLogPath, "Query %s", query);
 	SQL_TQuery(db, tbasico, query);
@@ -274,7 +274,7 @@ public OnSqlConnect(Handle:owner, Handle:hndl, const String:error[], any:data)
 	
 		if (ismysql == 1)
 		{
-			Format(buffer, sizeof(buffer), "CREATE TABLE IF NOT EXISTS `autoinviterv4` (`steam` varchar(64) NOT NULL, `last_accountuse` int(64) NOT NULL DEFAULT '0')");
+			Format(buffer, sizeof(buffer), "CREATE TABLE IF NOT EXISTS `autoinviterv41` (`steam` varchar(64) NOT NULL, `last_accountuse` int(64) NOT NULL DEFAULT '0')");
 
 			LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
 			SQL_TQuery(db, tbasicoC, buffer);
@@ -282,7 +282,7 @@ public OnSqlConnect(Handle:owner, Handle:hndl, const String:error[], any:data)
 		}
 		else
 		{
-			Format(buffer, sizeof(buffer), "CREATE TABLE IF NOT EXISTS autoinviterv4 (steam varchar(64) NOT NULL, `last_accountuse` int(64) NOT NULL DEFAULT '0')");
+			Format(buffer, sizeof(buffer), "CREATE TABLE IF NOT EXISTS autoinviterv41 (steam varchar(64) NOT NULL, `last_accountuse` int(64) NOT NULL DEFAULT '0')");
 		
 			LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
 			SQL_TQuery(db, tbasicoC, buffer);
@@ -410,9 +410,9 @@ public OnCommunityRemoveFriendResult(const String:friend[], errorCode, any:data)
 	char buffer[255];
 	
 	if (ismysql == 1)
-		Format(buffer, sizeof(buffer), "DELETE FROM `autoinviterv4` WHERE `steam`='%s';", friend);
+		Format(buffer, sizeof(buffer), "DELETE FROM `autoinviterv41` WHERE `steam`='%s';", friend);
 	else
-		Format(buffer, sizeof(buffer), "DELETE FROM autoinviterv4 WHERE steam='%s';", friend);
+		Format(buffer, sizeof(buffer), "DELETE FROM autoinviterv41 WHERE steam='%s';", friend);
 		
 		
 	LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
@@ -434,9 +434,9 @@ public PruneDatabase()
 	decl String:buffer[1024];
 
 	if (ismysql == 1)
-		Format(buffer, sizeof(buffer), "SELECT steam FROM `autoinviterv4` WHERE `last_accountuse`<'%d' AND `last_accountuse`>'0';", maxlastaccuse);
+		Format(buffer, sizeof(buffer), "SELECT steam FROM `autoinviterv41` WHERE `last_accountuse`<'%d' AND `last_accountuse`>'0';", maxlastaccuse);
 	else
-		Format(buffer, sizeof(buffer), "SELECT steam FROM autoinviterv4 WHERE last_accountuse<'%d' AND last_accountuse>'0';", maxlastaccuse);
+		Format(buffer, sizeof(buffer), "SELECT steam FROM autoinviterv41 WHERE last_accountuse<'%d' AND last_accountuse>'0';", maxlastaccuse);
 
 	LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
 	SQL_TQuery(db, tbasicoP, buffer);
@@ -462,9 +462,9 @@ public tbasicoP(Handle:owner, Handle:hndl, const String:error[], any data)
 			SQL_FetchString(hndl, 0, steamid, sizeof(steamid));
 			
 			if (ismysql == 1)
-				Format(buffer, sizeof(buffer), "DELETE FROM `autoinviterv4` WHERE `steam`='%s';", steamid);
+				Format(buffer, sizeof(buffer), "DELETE FROM `autoinviterv41` WHERE `steam`='%s';", steamid);
 			else
-				Format(buffer, sizeof(buffer), "DELETE FROM autoinviterv4 WHERE steam='%s';", steamid);
+				Format(buffer, sizeof(buffer), "DELETE FROM autoinviterv41 WHERE steam='%s';", steamid);
 		
 		
 			LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
