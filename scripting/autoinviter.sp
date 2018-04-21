@@ -41,7 +41,7 @@ new g_groupCount = 0;
 
 bool g_invited[MAXPLAYERS + 1];
 
-#define PLUGIN_VERSION "4.1"
+#define PLUGIN_VERSION "4.2b"
 
 public Plugin:myinfo = 
 {
@@ -99,6 +99,7 @@ public OnPluginStart()
 public Action DoInvite(Handle timer)
 {
 	PruneDatabase();
+	PruneDatabaseInvite();
 }
 
 public OnClientPostAdminCheck(client)
@@ -418,6 +419,73 @@ public OnCommunityRemoveFriendResult(const String:friend[], errorCode, any:data)
 	LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
 	SQL_TQuery(db, tbasico, buffer);
 }
+
+public PruneDatabaseInvite()
+{
+	if (db == INVALID_HANDLE)
+	{
+		LogToFileEx(g_sCmdLogPath, "Prune Database: No connection");
+		ComprobarDB();
+		return;
+	}
+
+	new maxlastaccuse;
+	maxlastaccuse = GetTime() - (1 * 86400);
+
+	decl String:buffer[1024];
+
+	if (ismysql == 1)
+		Format(buffer, sizeof(buffer), "SELECT steam FROM `autoinviterv41` WHERE `last_accountuse`<'%d' AND `last_accountuse`>'0' ORDER BY `last_accountuse` ASC LIMIT 1;", maxlastaccuse);
+	else
+		Format(buffer, sizeof(buffer), "SELECT steam FROM autoinviterv41 WHERE last_accountuse<'%d' AND last_accountuse>'0' ORDER BY last_accountuse ASC LIMIT 1;", maxlastaccuse);
+
+	LogToFileEx(g_sCmdLogPath, "Query %s", buffer);
+	SQL_TQuery(db, tbasicoPInviter, buffer);
+}
+
+public tbasicoPInviter(Handle:owner, Handle:hndl, const String:error[], any data)
+{
+	
+	if (hndl == INVALID_HANDLE)
+	{
+		LogToFileEx(g_sCmdLogPath, "Query failure: %s", error);
+		ComprobarDB();
+		return;
+	}
+
+	char steamid[64];
+	//char buffer[255];
+	
+	if(SQL_HasResultSet(hndl))
+	{
+		while (SQL_FetchRow(hndl))
+		{
+			SQL_FetchString(hndl, 0, steamid, sizeof(steamid));
+			
+			int count = 5;
+			for (new i=0; i<g_groupCount; ++i)
+			{
+				DataPack pack;
+				CreateDataTimer(count*1.0, InvitePlayer, pack);
+				pack.WriteCell(i);
+				pack.WriteString(steamid);
+			
+				count += 5;
+			}
+	
+			char chatmsg[3096];
+			GetConVarString(cvar_chat, chatmsg, 3096);
+	
+			if(!SteamChatIsConnected()) SteamChatConnect();
+	
+			SteamChatSendMessage(steamid, chatmsg);
+	
+			if (GetConVarBool(cvarRemoveFriends)) CreateTimer(60.0, removeTimer, SteamID64to32(steamid));
+		}
+	}
+}
+
+
 
 public PruneDatabase()
 {
