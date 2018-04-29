@@ -1,3 +1,34 @@
+### ASteambot version
+
+
+## Requeriments:
+
+
+* SteamWorks -> http://users.alliedmods.net/~kyles/builds/SteamWorks/
+
+* ASteambot -> https://forums.alliedmods.net/showthread.php?p=2352347
+
+* Steam account (not your main account).
+
+
+## Installation:
+
+* Configure the groups to invite here: configs/franug-autoinviter/franug_autoinviter.cfg (use steamgroup id per section).**
+* Also you need to add a database entry to databases.cfg called "autoinviter".
+* Wait about 3 days for check group history for check invites.
+
+
+Note: 
+
+Get groupid64 -> https://support.multiplay.co.uk/support/solutions/articles/1000202859-how-can-i-find-my-steam-group-64-id-
+
+
+
+
+
+### Steamcore version
+
+
 ## Requeriments:
 
 
