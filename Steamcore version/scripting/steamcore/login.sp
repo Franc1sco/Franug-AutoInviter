@@ -137,7 +137,7 @@ Login_SteamLogIn()
 	if (isLogging) return;
 	if (!SteamWorks_IsConnected()) return;
 	retrieveLoginInfo();
-	login_request = SteamWorks_CreateHTTPRequest(k_EHTTPMethodGET, "http://steamcommunity.com/login/getrsakey/");
+	login_request = SteamWorks_CreateHTTPRequest(k_EHTTPMethodGET, "https://steamcommunity.com/login/getrsakey/");
 	SteamWorks_SetHTTPRequestGetOrPostParameter(login_request, "username", login_username);
 	SteamWorks_SetHTTPCallbacks(login_request, cbkRsaKeyRequest);
 	SteamWorks_SetHTTPRequestNetworkActivityTimeout(login_request, LOGIN_TIMEOUT);

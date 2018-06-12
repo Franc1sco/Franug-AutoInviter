@@ -39,7 +39,7 @@ public nativeAnnounce(Handle:plugin, numParams)
 	data = GetNativeCell(4);
 	
 	decl String:URL[128];
-	Format(URL, sizeof(URL), "http://steamcommunity.com/gid/%s/announcements", groupID);
+	Format(URL, sizeof(URL), "https://steamcommunity.com/gid/%s/announcements", groupID);
 	
 	LogDebug("Preparing request to: \n%s...", URL);
 	LogDebug("Title: \n%s", title);
@@ -177,7 +177,7 @@ public nativeInvite(Handle:plugin, numParams)
 	GetNativeString(2, groupID, sizeof groupID);
 	data = GetNativeCell(3);
 	
-	decl String:URL[] = "http://steamcommunity.com/actions/GroupInvite";
+	decl String:URL[] = "https://steamcommunity.com/actions/GroupInvite";
 	
 	LogDebug("Preparing request to: \n%s...", URL);
 	LogDebug("Invitee community ID: \n%s", invitee);
@@ -350,7 +350,7 @@ public nativeAddFriend(Handle:plugin, numParams)
 	GetNativeString(1, friend, sizeof friend);
 	data = GetNativeCell(2);
 	
-	decl String:URL[] = "http://steamcommunity.com/actions/AddFriendAjax";
+	decl String:URL[] = "https://steamcommunity.com/actions/AddFriendAjax";
 	
 	LogDebug("Preparing request to: \n%s...", URL);
 	LogDebug("Friend community ID: \n%s", friend);
@@ -448,6 +448,30 @@ public cbkAddFriend(Handle:response, bool:failure, bool:requestSuccessful, EHTTP
 		onAddFriendResult(response, Handle:container, 0x33, data);
 		return;
 	}
+	else if (StrEqual(error, "84"))
+	{
+		LogDebug("You've been sending too many invitations lately. Please try again in a day or two.");
+		onAddFriendResult(response, Handle:container, 0x35, data);
+		return;
+	}
+	else if (StrEqual(error, "25"))
+	{
+		LogDebug("Your account friends list is full.");
+		onAddFriendResult(response, Handle:container, 0x36, data);
+		return;
+	}
+	else if (StrEqual(error, "15"))
+	{
+		LogDebug("Invited account friends list is full.");
+		onAddFriendResult(response, Handle:container, 0x37, data);
+		return;
+	}
+	else if (StrEqual(error, "11"))
+	{
+		LogDebug("You blocked the account you are trying to invite.");
+		onAddFriendResult(response, Handle:container, 0x38, data);
+		return;
+	}
 	else if (StrEqual(responseBody, "false"))
 	{
 		LogDebug("Add request failed. Plugin is not logged in. Retrying loggin.");
@@ -485,7 +509,7 @@ public nativeRemoveFriend(Handle:plugin, numParams)
 	GetNativeString(1, friend, sizeof friend);
 	data = GetNativeCell(2);
 	
-	decl String:URL[] = "http://steamcommunity.com/actions/RemoveFriendAjax";
+	decl String:URL[] = "https://steamcommunity.com/actions/RemoveFriendAjax";
 	
 	LogDebug("Preparing request to: \n%s...", URL);
 	LogDebug("Ex-Friend community ID: \n%s", friend);
